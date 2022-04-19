@@ -157,3 +157,47 @@ const markup = articles
     };
       
       addClickListenersToTags();
+
+      function generateAuthors(){
+        const articles = Array.from(document.querySelectorAll(optArticleSelector));
+        //Add author names to each articcle
+        let authorNames = {};
+        articles.forEach(article => {
+          const author = article.getAttribute('data-author');
+          const authorElement = article.querySelector(optArticleAuthorSelector);
+          authorElement.innerText = author;
+          if (!authorNames[author]){
+            authorNames[author] = 1;
+          } else {
+            authorNames[author] ++;
+          }
+        });
+        let html = '';
+        Object.keys(authorNames).forEach(name => {
+          html += `<li>
+                      <a href="#author-${name.split(' ').join('-')}" class="author-link">
+                      <span class="author-name">${name}</span>
+                      </a>(${authorNames[name]})</li>`;
+        });
+        const authorNameWrapper = document.querySelector(optAuthorListSelector);
+        authorNameWrapper.insertAdjacentHTML('afterbegin', html);
+      };
+        generateAuthors();
+
+        const authorClickHandler = function(event) {
+          event.preventDefault();
+          const clickedElement = this;
+          const href = clickedElement.getAttribute('href');
+          const author = clickedElement.innerText.trim();
+          const activeAuthorLinks = document.querySelectorAll(optActiveAuthorLinksSelector);
+          activeAuthorLinks.forEach(link => link.classList.remove('active'));
+          const foundLinks = document.querySelectorAll('a[href="' + href + '"]');
+          foundLinks.forEach(link => link.classList.add('active'));
+          generateTitleLinks('[data-author="' + author + '"]');
+        };
+      
+        const addClickListenersToAuthors = function (){
+          const authorLinks = Array.from(document.querySelectorAll(optAuthorLinksSelector));
+          authorLinks.forEach(link => link.addEventListener('click', authorClickHandler));  
+        };
+          addClickListenersToAuthors();
